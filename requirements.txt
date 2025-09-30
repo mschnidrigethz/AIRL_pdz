@@ -1,0 +1,24 @@
+# Core dependencies for AIRL training
+torch>=1.12.0
+numpy>=1.21.0
+h5py>=3.7.0
+PyYAML>=6.0
+tensorboard>=2.10.0
+matplotlib>=3.5.0
+tqdm>=4.64.0
+
+# Gym/Gymnasium for environment interface
+gymnasium>=0.26.0
+
+# Optional: fallback to gym if gymnasium not available  
+gym>=0.21.0
+
+# Development dependencies (install with: pip install -r requirements-dev.txt)
+# pytest>=7.0.0
+# black>=22.0.0
+# isort>=5.10.0
+# flake8>=4.0.0
+# pre-commit>=2.17.0
+
+# Note: Isaac Lab dependencies are managed by Isaac Lab installation
+# Make sure Isaac Lab is properly installed and activated before running this project

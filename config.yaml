@@ -1,0 +1,99 @@
+[INFO]: Time taken for scene creation : 130.060758 seconds
+❌ Isaac Lab creation failed: USD file not found at path at: 'omniverse://ov-content.ovaleveloper.com/Isaac/IsaacLab/Robots/FrankaEmika/panda_instanceable.usd'.
+🎯 Falling back to dummy environment for training...
+❌ Failed to create Isaac Lab environment: USD file not found at path at: 'omniverse://ov-content.ovaleveloper.com/Isaac/IsaacLab/Robots/FrankaEmika/panda_instanceable.usd'.
+❌ Using dummy environment# AIRL Training Configuration for Franka Cube Lift Task
+
+# Environment Settings
+env:
+  name: "Isaac-Lift-Cube-Franka-v0"  # Use Isaac Lab registered environment
+  num_envs: 1  # Start with 1 environment for simplicity
+  max_episode_length: 1000
+  reset_on_termination: true
+  headless: true  # Set to true for faster training, false for visualization
+  
+  # Franka specific settings
+  robot_cfg:
+    spawn_height: 0.0
+    initial_joint_pos: [0.0, -0.569, 0.0, -2.81, 0.0, 3.037, 0.741, 0.04, 0.04]
+    
+  # Cube settings  
+  object_cfg:
+    spawn_height: 0.8
+    size: [0.05, 0.05, 0.05]
+    mass: 0.1
+    
+  # Task settings
+  task:
+    target_height: 0.15  # Height above table to lift cube
+    success_threshold: 0.02  # Distance threshold for success
+    max_consecutive_successes: 50
+
+# Network Architecture
+network:
+  policy:
+    hidden_sizes: [256, 256]
+    activation: "relu"
+    initialization: "orthogonal"
+    
+  discriminator:
+    hidden_sizes: [256, 256] 
+    activation: "relu"
+    gamma: 0.99
+
+# Training Hyperparameters
+training:
+  # General
+  total_timesteps: 10000000
+  num_episodes: 5000
+  max_steps_per_episode: 1000
+  
+  # PPO Parameters
+  ppo:
+    learning_rate: 0.00001  # 100x kleiner!
+    value_learning_rate: 0.00001  # 100x kleiner!
+    clip_epsilon: 0.2
+    epochs_per_update: 10
+    batch_size: 64
+    buffer_size: 2048
+    gamma: 0.99
+    gae_lambda: 0.95
+    entropy_coef: 0.01
+    value_loss_coef: 0.5
+    max_grad_norm: 0.1  # Stärkeres Gradient Clipping
+    
+  # AIRL Discriminator
+  discriminator:
+    learning_rate: 0.00001  # 100x kleiner!
+    batch_size: 64
+    update_frequency: 1  # Update discriminator every N episodes
+    
+  # Expert Data
+  expert_data:
+    path: "/home/chris/IsaacLab_mik/Projects/airl_franka/data/merged_real_dataset_1.1to1.6.hdf5"
+    batch_size: 64
+    validation_split: 0.1
+
+# Logging and Checkpoints  
+logging:
+  log_interval: 10  # Episodes
+  save_interval: 100  # Episodes
+  tensorboard_dir: "logs/tensorboard"
+  checkpoint_dir: "logs/checkpoints"
+  
+  # Metrics to track
+  metrics:
+    - "episode_reward"
+    - "episode_length" 
+    - "success_rate"
+    - "discriminator_loss"
+    - "policy_loss"
+    - "value_loss"
+
+# Device Settings
+device:
+  use_cuda: true
+  cuda_device: 0
+  
+# Reproducibility
+seed: 42
